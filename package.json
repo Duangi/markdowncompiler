@@ -1,6 +1,6 @@
 {
   "name": "markdowncompiler",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "markdowncompiler - markdown String to tokens or html.",
   "keywords": [
     "markdown",
@@ -9,8 +9,8 @@
   ],
   "homepage": "https://github.com/Duangi/markdowncompiler",
   "repository": {
-      "type": "git",
-      "url": "git@github.com:Duangi/markdowncompiler.git"
+    "type": "git",
+    "url": "git@github.com:Duangi/markdowncompiler.git"
   },
   "license": "MIT",
   "author": "duangi",
