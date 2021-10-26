@@ -1,6 +1,7 @@
 # markdowncompiler
 
-> 将markdown解析成tokens,方便构建WYSIWYG的markdown编辑器
+> 用于将markdown解析成tokens,将tokens渲染为html字符串。
+> 方便构建WYSIWYG的markdown编辑器
 
 - [Install](#install)
 - [Usage examples](#usage-examples)
@@ -20,5 +21,6 @@ npm install markdowncompiler --save
 ```javascript
 import MarkdownCompiler from ('markdowncompiler')
 const md = new MarkdownCompiler()
-md.markdown2Tokens('# 123\n## 456\n```python\nprint(123)\n```')
+tokens = md.markdown2Tokens('# 123\n## 456\n```python\nprint(123)\n```')
+html = md.tokens2Html(tokens)
 ```

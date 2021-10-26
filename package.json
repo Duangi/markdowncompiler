@@ -5,7 +5,8 @@
   "keywords": [
     "markdown",
     "parser",
-    "compiler"
+    "compiler",
+    "WYSIWYG"
   ],
   "homepage": "https://github.com/Duangi/markdowncompiler",
   "repository": {
