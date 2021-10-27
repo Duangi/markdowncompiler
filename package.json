@@ -1,6 +1,6 @@
 {
   "name": "markdowncompiler",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "markdowncompiler - markdown String to tokens or html.",
   "keywords": [
     "markdown",
