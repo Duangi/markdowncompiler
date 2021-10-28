@@ -1,7 +1,7 @@
 {
   "name": "markdowncompiler",
-  "version": "0.2.3",
-  "type":"module",
+  "version": "0.3.0",
+  "type": "module",
   "description": "markdowncompiler - markdown String to tokens or html.",
   "keywords": [
     "markdown",
