@@ -1,5 +1,5 @@
 'use strict'
 
-// module.exports = require('./lib/');
-import * as _ from '/lib/'
-
+import MarkdownCompiler from './lib/index.js'
+export default MarkdownCompiler 
+// console.log(123)

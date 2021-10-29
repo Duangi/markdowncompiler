@@ -9,6 +9,11 @@
     "compiler",
     "WYSIWYG"
   ],
+  "scripts": {
+      "dev": "webpack --mode development --output-filename markdowncompiler.js",
+      "build": "webpack --mode production --output-filename markdowncompiler.min.js",
+      "publish": "npm run dev && npm run build && npm publish"
+  },
   "homepage": "https://github.com/Duangi/markdowncompiler",
   "repository": {
     "type": "git",
@@ -16,5 +21,11 @@
   },
   "license": "MIT",
   "author": "duangi",
-  "main": "index.js"
+  "main": "./dist/markdowncompiler.min.js",
+  "devDependencies": {
+    "@babel/core": "^7.15.8",
+    "@babel/preset-env": "^7.15.8",
+    "babel-loader": "^8.2.3",
+    "webpack": "^5.60.0"
+  }
 }
