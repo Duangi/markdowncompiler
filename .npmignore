@@ -1,0 +1,6 @@
+.vscode/
+lib/
+.babelrc
+webpack.config.js
+demo.js
+index.js

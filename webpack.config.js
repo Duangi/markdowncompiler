@@ -1,6 +1,7 @@
-let {resolve} = require('path');
-module.exports = {
-    entry: './index.js',//入口文件
+import path, {resolve} from  'path'
+const __dirname = path.resolve()
+export default  {
+    entry: './lib/index.js',//入口文件
     output: {                                    
         path: resolve(__dirname,'dist'),    //输出文件的路径
         filename: 'bundle.js'                     //指定输出的文件名
@@ -11,10 +12,7 @@ module.exports = {
             {
                 test: /\.js$/,
                 use:{
-                    loader: "babel-loader",
-                    options: {
-                        presets: ['@babel/preset-env']
-                    }
+                    loader: "babel-loader"
                 },
                 exclude: /node_modules/,
             },

@@ -2,6 +2,8 @@
   "name": "markdowncompiler",
   "version": "0.3.1",
   "type": "module",
+  "main": "./dist/markdowncompiler.umd.js",
+  "module": "./dist/markdowncompiler.es.js",
   "description": "markdowncompiler - markdown String to tokens or html.",
   "keywords": [
     "markdown",
@@ -10,9 +12,7 @@
     "WYSIWYG"
   ],
   "scripts": {
-    "dev": "webpack --mode development --output-filename markdowncompiler.js",
-    "build": "webpack --mode production --output-filename markdowncompiler.min.js",
-    "publish": "npm run dev && npm run build && npm publish"
+      "dev": "rollup -c rollup.config.js"
   },
   "homepage": "https://github.com/Duangi/markdowncompiler",
   "repository": {
@@ -21,11 +21,21 @@
   },
   "license": "MIT",
   "author": "duangi",
-  "main": "./dist/markdowncompiler.min.js",
+  
   "devDependencies": {
     "@babel/core": "^7.15.8",
     "@babel/preset-env": "^7.15.8",
     "babel-loader": "^8.2.3",
+    "babel-preset-es2015-rollup": "^3.0.0",
+    "rollup": "^2.58.3",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-json": "^4.0.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-terser": "^7.0.2",
     "webpack": "^5.60.0"
+  },
+  "dependencies": {
+    "@babel/cli": "^7.15.7"
   }
 }
