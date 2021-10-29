@@ -1,6 +1,6 @@
 {
   "name": "markdowncompiler",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "type": "module",
   "main": "./dist/markdowncompiler.umd.js",
   "module": "./dist/markdowncompiler.es.js",
@@ -12,7 +12,7 @@
     "WYSIWYG"
   ],
   "scripts": {
-      "dev": "rollup -c rollup.config.js"
+    "dev": "rollup -c rollup.config.js"
   },
   "homepage": "https://github.com/Duangi/markdowncompiler",
   "repository": {
@@ -21,7 +21,6 @@
   },
   "license": "MIT",
   "author": "duangi",
-  
   "devDependencies": {
     "@babel/core": "^7.15.8",
     "@babel/preset-env": "^7.15.8",
