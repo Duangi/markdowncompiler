@@ -2,7 +2,7 @@
   "name": "markdowncompiler",
   "version": "0.4.1",
   "type": "module",
-  "main": "./dist/markdowncompiler.umd.js",
+  "main": "./dist/markdowncompiler.es.js",
   "module": "./dist/markdowncompiler.es.js",
   "description": "markdowncompiler - markdown String to tokens or html.",
   "keywords": [
