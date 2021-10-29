@@ -1,6 +1,6 @@
 {
   "name": "markdowncompiler",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "type": "module",
   "description": "markdowncompiler - markdown String to tokens or html.",
   "keywords": [
@@ -10,9 +10,9 @@
     "WYSIWYG"
   ],
   "scripts": {
-      "dev": "webpack --mode development --output-filename markdowncompiler.js",
-      "build": "webpack --mode production --output-filename markdowncompiler.min.js",
-      "publish": "npm run dev && npm run build && npm publish"
+    "dev": "webpack --mode development --output-filename markdowncompiler.js",
+    "build": "webpack --mode production --output-filename markdowncompiler.min.js",
+    "publish": "npm run dev && npm run build && npm publish"
   },
   "homepage": "https://github.com/Duangi/markdowncompiler",
   "repository": {
