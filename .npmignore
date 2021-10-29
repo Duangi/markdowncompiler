@@ -1,6 +1,9 @@
 .vscode/
 lib/
+devdist/
 .babelrc
 webpack.config.js
 demo.js
 index.js
+rollup.config.dev.js
+rollup.config.js
