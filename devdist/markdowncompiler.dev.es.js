@@ -48,86 +48,6 @@ var CHAR_TAB$1 = 0x09;
 var CHAR_NEW_LINE = 0x0A;
 var CHAR_SPACE$1 = 0x20;
 
-var BlockRules = /*#__PURE__*/function () {
-  function BlockRules() {
-    _classCallCheck(this, BlockRules);
-
-    this.rules = [fence, heading, paragraph];
-  }
-
-  _createClass(BlockRules, [{
-    key: "getRules",
-    value: function getRules() {
-      return this.rules;
-    }
-  }]);
-
-  return BlockRules;
-}();
-
-function fence(state, startLine, endLine) {
-  // 只需要判断当前第一行是否为 ```xxx 代码块类似的格式即可
-  // 如果第一行未通过正则检测，则直接返回false
-  // 如果判断通过，则后面的每一行内容都加入代码块，直到遇到```为止 
-  var currentLineStr = state.getLinesContent(startLine);
-
-  if (!FENCE_BEGIN_REG.test(currentLineStr)) {
-    return false;
-  } // 代码块内容起始
-
-
-  var currentLine = startLine + 1; // 代码类型
-
-  var info = currentLineStr.split('```')[1]; // 代码类型部分的起止点 在原字符串中的位置映射
-  // 通过改变某个token中的内容，映射到原字符串中的内容，将原markdown字符串同步修改，顺便把html的内容也修改了？
-  // string==(parser)==>tokens==(render)==>html
-  // html==(oninput)==>tokens==(proxy)==>string
-  // 实现关键：tokens渲染为html时需要带上index
-
-  [state.beginMarks[currentLine] + 3, state.endMarks[currentLine]];
-
-  for (currentLine = startLine + 1; currentLine < endLine; currentLine++) {
-    // 匹配到结束符
-    if (FENCE_END_REG.test(state.getLinesContent(currentLine))) {
-      break;
-    }
-  } // for循环结束 currentLine指向代码块结束标记符 即'```'
-
-
-  content = state.getLinesContent(startLine + 1, currentLine - 1);
-  token = state.push('fence', 'code', 0);
-  token.content = content;
-  token.info = info; // 标志parser下一步应该从哪一行开始处理
-
-  var nextLine = currentLine + 1;
-  return nextLine;
-}
-
-function heading(state, startLine, endLine) {
-  var currentLineStr = state.getLinesContent(startLine);
-
-  if (!HEADING_REG.test(currentLineStr)) {
-    return false;
-  } // 判断heading类型  h1-h6
-
-
-  var headingType = 'h' + currentLineStr.split(' ')[0].length;
-  var token = state.push('heading_open', headingType, 1);
-  token = state.push('inline', 'text', 0);
-  token.content = currentLineStr.split(' ')[1];
-  token = state.push('heading_close', headingType, -1);
-  return startLine + 1;
-}
-
-function paragraph(state, startLine, endLine) {
-  // 所有规则都没有匹配成功时，默认匹配paragraph
-  token = state.push('paragraph_open', 'p', 1);
-  token = state.push('inline', 'text', 0);
-  token.content = state.getLinesContent(startLine);
-  token = state.push('paragraph_close', 'p', -1);
-  return startLine + 1;
-}
-
 function isSpace(code) {
   switch (code) {
     case CHAR_TAB$1:
@@ -155,6 +75,176 @@ function escapeHtml(str) {
 
   return str;
 }
+
+var Fence = /*#__PURE__*/function () {
+  function Fence() {
+    _classCallCheck(this, Fence);
+  }
+
+  _createClass(Fence, null, [{
+    key: "token2Markdown",
+    value: function token2Markdown(token) {
+      return '```' + token.info + '\n' + token.content + '\n```';
+    }
+  }, {
+    key: "token2Html",
+    value: function token2Html(token) {
+      return '<pre><code>' + escapeHtml(token.content) + '</code></pre>\n';
+    }
+  }, {
+    key: "fence",
+    value: function fence(state, startLine, endLine) {
+      // 只需要判断当前第一行是否为 ```xxx 代码块类似的格式即可
+      // 如果第一行未通过正则检测，则直接返回false
+      // 如果判断通过，则后面的每一行内容都加入代码块，直到遇到```为止 
+      var currentLineStr = state.getLinesContent(startLine);
+
+      if (!FENCE_BEGIN_REG.test(currentLineStr)) {
+        return false;
+      } // 代码块内容起始
+
+
+      var currentLine = startLine + 1; // 代码类型
+
+      var info = currentLineStr.split('```')[1]; // 代码类型部分的起止点 在原字符串中的位置映射
+      // 通过改变某个token中的内容，映射到原字符串中的内容，将原markdown字符串同步修改，顺便把html的内容也修改了？
+      // string==(parser)==>tokens==(render)==>html
+      // html==(oninput)==>tokens==(proxy)==>string
+      // 实现关键：tokens渲染为html时需要带上index
+
+      [state.beginMarks[currentLine] + 3, state.endMarks[currentLine]];
+
+      for (currentLine = startLine + 1; currentLine < endLine; currentLine++) {
+        // 匹配到结束符
+        if (FENCE_END_REG.test(state.getLinesContent(currentLine))) {
+          break;
+        }
+      } // for循环结束 currentLine指向代码块结束标记符 即'```'
+
+
+      var content = state.getLinesContent(startLine + 1, currentLine - 1);
+      var token = state.push('fence', 'code', 0);
+      token.content = content;
+      token.info = info; // 标志parser下一步应该从哪一行开始处理
+
+      var nextLine = currentLine + 1;
+      return nextLine;
+    }
+  }]);
+
+  return Fence;
+}();
+
+var Heading = /*#__PURE__*/function () {
+  function Heading() {
+    _classCallCheck(this, Heading);
+  }
+
+  _createClass(Heading, null, [{
+    key: "token2Markdown_open",
+    value: function token2Markdown_open(token) {
+      var head = '######';
+      head = head.substr(0, Number(token.tag.split('h')[1])) + ' ';
+      return head;
+    }
+  }, {
+    key: "token2Markdown_close",
+    value: function token2Markdown_close(token) {
+      return '';
+    }
+  }, {
+    key: "token2Html_open",
+    value: function token2Html_open(token) {
+      return "<".concat(token.tag, ">");
+    }
+  }, {
+    key: "token2Html_close",
+    value: function token2Html_close(token) {
+      return "</".concat(token.tag, ">");
+    }
+  }, {
+    key: "heading",
+    value: function heading(state, startLine, endLine) {
+      var currentLineStr = state.getLinesContent(startLine);
+
+      if (!HEADING_REG.test(currentLineStr)) {
+        return false;
+      } // 判断heading类型  h1-h6
+
+
+      var headingType = 'h' + currentLineStr.split(' ')[0].length;
+      var token = state.push('heading_open', headingType, 1);
+      token = state.push('inline', 'text', 0);
+      token.content = currentLineStr.split(' ')[1];
+      token = state.push('heading_close', headingType, -1);
+      return startLine + 1;
+    }
+  }]);
+
+  return Heading;
+}();
+
+// import { escapeHtml } from "../../common/utils"
+var Paragraph = /*#__PURE__*/function () {
+  function Paragraph() {
+    _classCallCheck(this, Paragraph);
+  }
+
+  _createClass(Paragraph, null, [{
+    key: "token2Markdown_open",
+    value: function token2Markdown_open(token) {
+      return '';
+    }
+  }, {
+    key: "token2Markdown_close",
+    value: function token2Markdown_close(token) {
+      return '';
+    }
+  }, {
+    key: "token2Html_open",
+    value: function token2Html_open(token) {
+      return "<p>";
+    }
+  }, {
+    key: "token2Html_close",
+    value: function token2Html_close(token) {
+      return "</p>";
+    }
+  }, {
+    key: "paragraph",
+    value: function paragraph(state, startLine, endLine) {
+      // 所有规则都没有匹配成功时，默认匹配paragraph
+      var token = state.push('paragraph_open', 'p', 1);
+      token = state.push('inline', 'text', 0);
+      token.content = state.getLinesContent(startLine);
+      token = state.push('paragraph_close', 'p', -1);
+      return startLine + 1;
+    }
+  }]);
+
+  return Paragraph;
+}();
+
+/**
+ * markdown块规则
+ */
+
+var BlockRules = /*#__PURE__*/function () {
+  function BlockRules() {
+    _classCallCheck(this, BlockRules);
+
+    this.rules = [Fence.fence, Heading.heading, Paragraph.paragraph];
+  }
+
+  _createClass(BlockRules, [{
+    key: "getRules",
+    value: function getRules() {
+      return this.rules;
+    }
+  }]);
+
+  return BlockRules;
+}();
 
 var Token = function Token(type, tag, nesting) {
   _classCallCheck(this, Token);
@@ -278,7 +368,18 @@ var BlockState = /*#__PURE__*/function () {
 
 var Parser = /*#__PURE__*/function () {
   function Parser() {
+    var _this = this;
+
     _classCallCheck(this, Parser);
+
+    _defineProperty(this, "addProxy2Tokens", function () {
+      _this.blockState.tokensProxy = new Proxy(_this.blockState.tokens, {
+        set: function set(obj, prop, value) {
+          console.log('tokens被修改');
+          return Reflect.set(obj, prop, value);
+        }
+      });
+    });
   }
 
   _createClass(Parser, [{
@@ -302,7 +403,7 @@ var Parser = /*#__PURE__*/function () {
 
       blockState.tokensProxy = new Proxy(blockState.tokens, {
         set: function set(obj, prop, value) {
-          console.log(111);
+          console.log(token被修改);
           return Reflect.set(obj, prop, value);
         }
       });
@@ -313,99 +414,99 @@ var Parser = /*#__PURE__*/function () {
   return Parser;
 }();
 
-var Render = /*#__PURE__*/function () {
-  function Render() {
-    var _this = this;
-
-    _classCallCheck(this, Render);
-
-    _defineProperty(this, "defaultRules", {
-      fence: this.fence,
-      heading_open: this.heading_open,
-      heading_close: this.heading_close,
-      paragraph_open: this.paragraph_open,
-      paragraph_close: this.paragraph_close,
-      inline: this.inline
-    });
-
-    _defineProperty(this, "rules", this.defaultRules);
-
-    _defineProperty(this, "tokens2Html", function (tokens) {
-      var result = '';
-      tokens.forEach(function (token) {
-        switch (token.type) {
-          case 'fence':
-            result += _this.rules.fence(token);
-            break;
-
-          case 'heading_open':
-            result += _this.rules.heading_open(token);
-            break;
-
-          case 'heading_close':
-            result += _this.rules.heading_close(token);
-            break;
-
-          case 'paragraph_open':
-            result += _this.rules.paragraph_open(token);
-            break;
-
-          case 'paragraph_close':
-            result += _this.rules.paragraph_close(token);
-            break;
-
-          case 'inline':
-            result += _this.rules.inline(token);
-        }
-      });
-      return result;
-    });
+var Inline = /*#__PURE__*/function () {
+  function Inline() {
+    _classCallCheck(this, Inline);
   }
 
-  _createClass(Render, [{
-    key: "fence",
-    value: function fence(token) {
-      return '<pre><code>' + escapeHtml(token.content) + '</code></pre>\n';
+  _createClass(Inline, null, [{
+    key: "token2Markdown",
+    value: function token2Markdown(token) {
+      return token.content;
     }
   }, {
-    key: "heading_open",
-    value: function heading_open(token) {
-      var headingType = token.tag;
-      return '<' + headingType + '>';
-    }
-  }, {
-    key: "heading_close",
-    value: function heading_close(token) {
-      var headingType = token.tag;
-      return '</' + headingType + '>';
-    }
-  }, {
-    key: "paragraph_open",
-    value: function paragraph_open(token) {
-      return '<p>';
-    }
-  }, {
-    key: "paragraph_close",
-    value: function paragraph_close(token) {
-      return '</p>';
-    }
-  }, {
-    key: "inline",
-    value: function inline(token) {
+    key: "token2Html",
+    value: function token2Html(token) {
       return token.content;
     }
   }]);
 
-  return Render;
+  return Inline;
 }();
+
+var Render = function Render() {
+  var _this = this;
+
+  var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+    WYSIWYG: true,
+    highlight: highlight
+  };
+
+  _classCallCheck(this, Render);
+
+  _defineProperty(this, "tokens2Html", function (tokens) {
+    var result = '';
+    tokens.forEach(function (token) {
+      switch (token.type) {
+        case 'fence':
+          result += _this.rules.fence(token);
+          break;
+
+        case 'heading_open':
+          result += _this.rules.heading_open(token);
+          break;
+
+        case 'heading_close':
+          result += _this.rules.heading_close(token);
+          break;
+
+        case 'paragraph_open':
+          result += _this.rules.paragraph_open(token);
+          break;
+
+        case 'paragraph_close':
+          result += _this.rules.paragraph_close(token);
+          break;
+
+        case 'inline':
+          result += _this.rules.inline(token);
+      }
+    });
+    return result;
+  });
+
+  this.WYSIWYG = options.WYSIWYG;
+  this.defaultRules = {
+    fence: Fence.token2Html,
+    heading_open: Heading.token2Html_open,
+    heading_close: Heading.token2Html_close,
+    paragraph_open: Paragraph.token2Html_open,
+    paragraph_close: Paragraph.token2Markdown_close,
+    inline: Inline.token2Html
+  }; // 用户将会在这里修改规则，该类应该提供一个更新规则的方法 或者直接通过renderInstance修改渲染规则
+
+  this.rules = this.defaultRules;
+} // 利用箭头函数特性 将当前实例的this绑定给该函数
+;
 
 var MarkdownCompiler = /*#__PURE__*/function () {
   function MarkdownCompiler() {
+    var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {
+      WYSIWYG: true,
+      // 代码高亮函数
+      highlight: function highlight(str, lang) {
+        return str;
+      }
+    };
+
     _classCallCheck(this, MarkdownCompiler);
 
     // 实例化Parser&Render
     this.parserInstance = new Parser();
-    this.renderInstance = new Render();
+    this.renderInstance = new Render({
+      WYSIWYG: options.WYSIWYG,
+      highlight: options.highlight
+    });
     this.markdown2Tokens = this.parserInstance.markdown2Tokens;
     this.tokens2Html = this.renderInstance.tokens2Html;
     this.parser = this.parserInstance.markdown2Tokens;
